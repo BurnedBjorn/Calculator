@@ -15,6 +15,8 @@ struct Token {
 	string name;
 	Token(char ch) :kind(ch), value(0) { }
 	Token(char ch, double val) :kind(ch), value(val) { }
+	Token(char ch, string nm) : kind(ch), name(nm){}
+
 };
 
 class Token_stream {
@@ -31,7 +33,7 @@ public:
 
 const char let = 'L';
 const char quit = 'Q';
-const char print = ';';
+const char printres = ';';
 const char number = '8';
 const char name = 'a';
 
@@ -221,7 +223,7 @@ double statement()
 
 void clean_up_mess()
 {
-	ts.ignore(print);
+	ts.ignore(printres);
 }
 
 const string prompt = "> ";
@@ -232,7 +234,7 @@ void calculate()
 	while (true) try {
 		cout << prompt;
 		Token t = ts.get();
-		while (t.kind == print) t = ts.get();
+		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
 		ts.unget(t);
 		cout << result << statement() << endl;
