@@ -8,17 +8,19 @@
 */
 
 #include "std_lib_facilities.h"
-
+// struct that holds the user input. 
 struct Token {
 	char kind;
 	double value;
 	string name;
 	Token(char ch) :kind(ch), value(0) { }
 	Token(char ch, double val) :kind(ch), value(val) { }
-	Token(char ch, string nm) : kind(ch), name(nm){}
+	Token(char ch, string nm) :kind(ch), name(nm), value(0) { }
 
 };
 
+
+//User input management
 class Token_stream {
 	bool full;
 	Token buffer;
@@ -31,12 +33,16 @@ public:
 	void ignore(char);
 };
 
+
+//constants
 const char let = 'L';
 const char quit = 'Q';
 const char printres = ';';
 const char number = '8';
 const char name = 'a';
 
+
+//function that gets the user input
 Token Token_stream::get()
 {
 	if (full) { full = false; return buffer; }
@@ -84,6 +90,7 @@ Token Token_stream::get()
 	}
 }
 
+// Function that skips a token
 void Token_stream::ignore(char c)
 {
 	if (full && c == buffer.kind) {
@@ -97,14 +104,17 @@ void Token_stream::ignore(char c)
 		if (ch == c) return;
 }
 
+// Data type for variables
 struct Variable {
 	string name;
 	double value;
 	Variable(string n, double v) :name(n), value(v) { }
 };
 
+//List of all variables in the program
 vector<Variable> names;
 
+//Function that gets variable's name, returns it's value
 double get_value(string s)
 {
 	for (int i = 0; i < names.size(); ++i)
@@ -112,6 +122,7 @@ double get_value(string s)
 	error("get: undefined name ", s);
 }
 
+//Function that sets the value of an existing variable
 void set_value(string s, double d)
 {
 	for (int i = 0; i <= names.size(); ++i)
@@ -122,6 +133,7 @@ void set_value(string s, double d)
 	error("set: undefined name ", s);
 }
 
+//Function that just checks if the variable has been declared
 bool is_declared(string s)
 {
 	for (int i = 0; i < names.size(); ++i)
@@ -129,10 +141,13 @@ bool is_declared(string s)
 	return false;
 }
 
+//Token stream instance i guess
 Token_stream ts;
 
+// expression function declaration
 double expression();
 
+//gets the primary value to work with
 double primary()
 {
 	Token t = ts.get();
@@ -154,6 +169,7 @@ double primary()
 	}
 }
 
+// Does multiplication/division to the primary if needed
 double term()
 {
 	double left = primary();
@@ -177,6 +193,7 @@ double term()
 	}
 }
 
+// does addition and subtraction of the terms if needed
 double expression()
 {
 	double left = term();
@@ -196,6 +213,7 @@ double expression()
 	}
 }
 
+//handles variable declaration
 double declaration()
 {
 	Token t = ts.get();
@@ -209,6 +227,7 @@ double declaration()
 	return d;
 }
 
+//checks if the line was declaration or expression, proceeds accordingly
 double statement()
 {
 	Token t = ts.get();
