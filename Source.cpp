@@ -240,14 +240,17 @@ double statement()
 	}
 }
 
+// skips until "printres" sign
 void clean_up_mess()
 {
 	ts.ignore(printres);
 }
 
+// symbols
 const string prompt = "> ";
 const string result = "= ";
 
+// main function, runs calculacion cycle
 void calculate()
 {
 	while (true) try {
@@ -265,20 +268,21 @@ void calculate()
 }
 
 int main()
-
-try {
-	calculate();
-	return 0;
-}
-catch (exception& e) {
-	cerr << "exception: " << e.what() << endl;
-	char c;
-	while (cin >> c && c != ';');
-	return 1;
-}
-catch (...) {
-	cerr << "exception\n";
-	char c;
-	while (cin >> c && c != ';');
-	return 2;
+{
+	try {
+		calculate();
+		return 0;
+	}
+	catch (exception& e) {
+		cerr << "exception: " << e.what() << endl;
+		char c;
+		while (cin >> c && c != ';');
+		return 1;
+	}
+	catch (...) {
+		cerr << "exception\n";
+		char c;
+		while (cin >> c && c != ';');
+		return 2;
+	}
 }
