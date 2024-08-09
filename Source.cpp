@@ -77,13 +77,13 @@ Token Token_stream::get()
 		return Token(number, val);
 	}
 	default:
-		if (isalpha(ch)) {
-			string s;
-			s += ch;
-			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s = ch;
+		if (isalpha(ch)) {			// if character is a letter
+			string s;				// create a string s
+			s += ch;				// add character to string
+			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // while ch is letter or digit, add to string 
 			cin.unget();
 			if (s == "let") return Token(let);
-			if (s == "quit") return Token(name);
+			if (s == "quit") return Token(name);		//?
 			return Token(name, s);
 		}
 		error("Bad token");
