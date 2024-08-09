@@ -141,6 +141,7 @@ bool is_declared(string s)
 	return false;
 }
 
+
 //Token stream instance i guess
 Token_stream ts;
 
@@ -252,6 +253,9 @@ double declaration()
 	names.push_back(Variable(name, d));
 	return d;
 }
+void define_value(string s, double d) {
+	names.push_back(Variable(s, d));
+}
 
 //checks if the line was declaration or expression, proceeds accordingly
 double statement()
@@ -296,6 +300,7 @@ void calculate()
 int main()
 {
 	try {
+		define_value("k", 1000);
 		calculate();
 		return 0;
 	}
