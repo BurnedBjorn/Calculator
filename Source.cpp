@@ -164,24 +164,31 @@ double primary()
 		return t.value;
 	case name:
 	{
-		string localname = t.name;
-		t = ts.get();
-		if (t.kind == '=') { // if next symbol is = then
+		if (is_declared(t.name)) {
+			string localname = t.name;
 			t = ts.get();
-			if (t.kind == number) {
-				set_value(localname, t.value);
-				cout << "value set";
-				return t.value;
+			if (t.kind == '=') { // if next symbol is = then
+				t = ts.get();
+				if (t.kind == number) {
+					set_value(localname, t.value);
+					cout << "value set: ";
+					return t.value;
+				}
+				else {
+					error("can't set value");
+				}
+
 			}
 			else {
-				error("can't set value");
+				ts.unget(t);
+				return get_value(localname);
 			}
-
 		}
-		else {
-			ts.unget(t);
-			return get_value(localname);
+		else
+		{
+			return get_value(t.name);
 		}
+		
 	}
 	default:
 		error("primary expected");
