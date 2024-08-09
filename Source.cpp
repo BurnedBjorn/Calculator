@@ -163,7 +163,26 @@ double primary()
 	case number:
 		return t.value;
 	case name:
-		return get_value(t.name);
+	{
+		string localname = t.name;
+		t = ts.get();
+		if (t.kind == '=') { // if next symbol is = then
+			t = ts.get();
+			if (t.kind == number) {
+				set_value(localname, t.value);
+				cout << "value set";
+				return t.value;
+			}
+			else {
+				error("can't set value");
+			}
+
+		}
+		else {
+			ts.unget(t);
+			return get_value(localname);
+		}
+	}
 	default:
 		error("primary expected");
 	}
@@ -205,7 +224,7 @@ double expression()
 			break;
 		case '-':
 			left -= term();
-			break;
+			break;	
 		default:
 			ts.unget(t);
 			return left;
