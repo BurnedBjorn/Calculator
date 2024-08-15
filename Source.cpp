@@ -193,14 +193,21 @@ double primary()
 		}
 		
 	}
-/*	case root:
+	case root:
 		t = ts.get();
 		if (t.kind == '(') {
 			double d = sqrt(expression());
+			t = ts.get();
 			if (t.kind == ')') {
-
+				return d;
 			}
-		}*/
+			else {
+				error(") expected");
+			}
+		}
+		else {
+			error("( expected");
+		}
 	default:
 		error("primary expected");
 	}
