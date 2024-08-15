@@ -41,6 +41,8 @@ const char printres = ';';
 const char number = '8';
 const char name = 'a';
 const char root = 'r';
+const char power = 'p';
+
 
 //function that gets the user input
 Token Token_stream::get()
@@ -58,6 +60,7 @@ Token Token_stream::get()
 	case '%':
 	case ';':
 	case '=':
+	case ',':
 		return Token(ch);
 	case '.':
 	case '0':
@@ -85,6 +88,7 @@ Token Token_stream::get()
 			if (s == "let") return Token(let);
 			if (s == "quit") return Token(quit);
 			if (s == "sqrt") return Token(root);
+			if (s == "pow") return Token(power);
 			return Token(name, s);
 		}
 		error("Bad token");
@@ -196,6 +200,7 @@ double primary()
 		
 	}
 	case root:
+	{
 		t = ts.get();
 		if (t.kind == '(') {
 			double d = expression();
@@ -205,12 +210,36 @@ double primary()
 				return sqrt(d);
 			}
 			else {
-				error(") expected");
+				error("root: ) expected");
 			}
 		}
 		else {
-			error("( expected");
+			error("root: ( expected");
 		}
+	}
+	case power:
+	{
+		t = ts.get();
+		if (t.kind == '(')
+		{
+			double d = expression();
+			double b = d;
+			t = ts.get();
+			if (t.kind != ',') error(", expected");
+			double p = expression();
+			t = ts.get();
+			if (t.kind == ')')
+			{
+				for (int i = 1; i < p; i++)
+				{
+					d *= b;
+				}
+				return(d);
+			}
+			else error("pow: ) expected");
+		}
+		else error("pow: ( expected");
+	}
 	default:
 		error("primary expected");
 	}
@@ -273,6 +302,8 @@ double declaration()
 	names.push_back(Variable(name, d));
 	return d;
 }
+
+// make a predefined variable
 void define_value(string s, double d) {
 	names.push_back(Variable(s, d));
 }
