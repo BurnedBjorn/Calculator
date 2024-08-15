@@ -40,7 +40,7 @@ const char quit = 'Q';
 const char printres = ';';
 const char number = '8';
 const char name = 'a';
-
+const char root = 'r';
 
 //function that gets the user input
 Token Token_stream::get()
@@ -83,7 +83,8 @@ Token Token_stream::get()
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // while ch is letter or digit, add to string 
 			cin.unget();
 			if (s == "let") return Token(let);
-			if (s == "quit") return Token(name);		//?
+			if (s == "quit") return Token(quit);
+			//if (s == "sqrt") return Token(root);
 			return Token(name, s);
 		}
 		error("Bad token");
@@ -264,6 +265,9 @@ double statement()
 	switch (t.kind) {
 	case let:
 		return declaration();
+		break;
+	case quit:
+		exit(0);
 	default:
 		ts.unget(t);
 		return expression();
