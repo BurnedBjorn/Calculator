@@ -84,7 +84,7 @@ Token Token_stream::get()
 			cin.unget();
 			if (s == "let") return Token(let);
 			if (s == "quit") return Token(quit);
-			//if (s == "sqrt") return Token(root);
+			if (s == "sqrt") return Token(root);
 			return Token(name, s);
 		}
 		error("Bad token");
@@ -159,6 +159,7 @@ double primary()
 		double d = expression();
 		t = ts.get();
 		if (t.kind != ')') error("'(' expected");
+		return d;
 	}
 	case '-':
 		return -primary();
@@ -192,6 +193,14 @@ double primary()
 		}
 		
 	}
+/*	case root:
+		t = ts.get();
+		if (t.kind == '(') {
+			double d = sqrt(expression());
+			if (t.kind == ')') {
+
+			}
+		}*/
 	default:
 		error("primary expected");
 	}
