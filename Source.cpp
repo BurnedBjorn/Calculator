@@ -149,6 +149,8 @@ Token_stream ts;
 // expression function declaration
 double expression();
 
+
+
 //gets the primary value to work with
 double primary()
 {
@@ -196,10 +198,11 @@ double primary()
 	case root:
 		t = ts.get();
 		if (t.kind == '(') {
-			double d = sqrt(expression());
+			double d = expression();
+			if (d < 0) error("can't sqrt negative number");
 			t = ts.get();
 			if (t.kind == ')') {
-				return d;
+				return sqrt(d);
 			}
 			else {
 				error(") expected");
