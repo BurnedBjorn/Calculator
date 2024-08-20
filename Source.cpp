@@ -113,7 +113,9 @@ void Token_stream::ignore(char c)
 struct Variable {
 	string name;
 	double value;
-	Variable(string n, double v) :name(n), value(v) { }
+	bool isconst;
+	Variable(string n, double v) :name(n), value(v), isconst(false) { }
+	Variable(string n, double v, bool c) :name(n), value(v), isconst(c) { }
 };
 
 //List of all variables in the program
@@ -130,11 +132,14 @@ double get_value(string s)
 //Function that sets the value of an existing variable
 void set_value(string s, double d)
 {
-	for (int i = 0; i <= names.size(); ++i)
-		if (names[i].name == s) {
+	
+	for (int i = 0; i <= names.size(); ++i) {
+		if ((names[i].name == s) && names[i].isconst == false) {
 			names[i].value = d;
 			return;
 		}
+		else if (names[i].isconst == true) error("trying to change a constant");
+	}
 	error("set: undefined name ", s);
 }
 
@@ -304,8 +309,8 @@ double declaration()
 }
 
 // make a predefined variable
-void define_value(string s, double d) {
-	names.push_back(Variable(s, d));
+void define_constant(string s, double d) {
+	names.push_back(Variable(s, d, true));
 }
 
 //checks if the line was declaration or expression, proceeds accordingly
@@ -354,7 +359,8 @@ void calculate()
 int main()
 {
 	try {
-		define_value("k", 1000);
+		define_constant("k", 1000);
+		define_constant("pi", 3.14);
 		calculate();
 		return 0;
 	}
