@@ -83,7 +83,7 @@ Token Token_stream::get()
 		if (isalpha(ch)) {			// if character is a letter
 			string s;				// create a string s
 			s += ch;				// add character to string
-			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // while ch is letter or digit, add to string 
+			while (cin.get(ch) && ((isalpha(ch) || isdigit(ch) || (ch == '_')))) s += ch; // while ch is letter or digit, add to string 
 			cin.unget();
 			if (s == "let") return Token(let);
 			if (s == "quit") return Token(quit);
