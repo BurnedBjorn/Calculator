@@ -118,40 +118,61 @@ struct Variable {
 	Variable(string n, double v, bool c) :name(n), value(v), isconst(c) { }
 };
 
-//List of all variables in the program
-vector<Variable> names;
-
-//Function that gets variable's name, returns it's value
-double get_value(string s)
-{
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return names[i].value;
-	error("get: undefined name ", s);
-}
-
-//Function that sets the value of an existing variable
-void set_value(string s, double d)
-{
+class Symbol_table {
+	vector<Variable> var_table;
+public:
 	
-	for (int i = 0; i <= names.size(); ++i) {
-		if ((names[i].name == s) && names[i].isconst == false) {
-			names[i].value = d;
+	void set_value(string s, double d);
+	bool is_declared(string s);
+	double get_value(string s);
+	void define_constant(string s, double d);
+	void add_variable(string name, double d);
+
+};
+
+
+void Symbol_table::set_value(string s, double d)
+{
+
+	for (int i = 0; i <= var_table.size(); ++i) {
+		if ((var_table[i].name == s) && var_table[i].isconst == false) {
+			var_table[i].value = d;
 			return;
 		}
-		else if (names[i].isconst == true) error("trying to change a constant");
+		else if (var_table[i].isconst == true) error("trying to change a constant");
 	}
 	error("set: undefined name ", s);
 }
 
 //Function that just checks if the variable has been declared
-bool is_declared(string s)
+bool Symbol_table::is_declared(string s)
 {
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return true;
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) return true;
 	return false;
 }
 
+//Function that gets variable's name, returns it's value
+double Symbol_table::get_value(string s)
+{
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) return var_table[i].value;
+	error("get: undefined name ", s);
+}
 
+// make a predefined variable
+void Symbol_table::define_constant(string s, double d) {
+	var_table.push_back(Variable(s, d, true));
+}
+
+// add variable to the table
+void Symbol_table::add_variable(string name, double d) {
+	var_table.push_back(Variable(name, d));
+}
+
+
+
+Symbol_table st;
 //Token stream instance i guess
 Token_stream ts;
 
@@ -178,13 +199,13 @@ double primary()
 		return t.value;
 	case name:
 	{
-		if (is_declared(t.name)) {
+		if (st.is_declared(t.name)) {
 			string localname = t.name;
 			t = ts.get();
 			if (t.kind == '=') { // if next symbol is = then
 				t = ts.get();
 				if (t.kind == number) {
-					set_value(localname, t.value);
+					st.set_value(localname, t.value);
 					cout << "value set: ";
 					return t.value;
 				}
@@ -195,12 +216,12 @@ double primary()
 			}
 			else {
 				ts.unget(t);
-				return get_value(localname);
+				return st.get_value(localname);
 			}
 		}
 		else
 		{
-			return get_value(t.name);
+			return st.get_value(t.name);
 		}
 		
 	}
@@ -300,18 +321,15 @@ double declaration()
 	Token t = ts.get();
 	if (t.kind != 'a') error("name expected in declaration");
 	string name = t.name;
-	if (is_declared(name)) error(name, " declared twice");
+	if (st.is_declared(name)) error(name, " declared twice");
 	Token t2 = ts.get();
 	if (t2.kind != '=') error("= missing in declaration of ", name);
 	double d = expression();
-	names.push_back(Variable(name, d));
+	st.add_variable(name, d);
 	return d;
 }
 
-// make a predefined variable
-void define_constant(string s, double d) {
-	names.push_back(Variable(s, d, true));
-}
+
 
 //checks if the line was declaration or expression, proceeds accordingly
 double statement()
@@ -359,8 +377,7 @@ void calculate()
 int main()
 {
 	try {
-		define_constant("k", 1000);
-		define_constant("pi", 3.14);
+		//Symbol_table::define_constant("pi", 3.141592);
 		calculate();
 		return 0;
 	}
