@@ -369,6 +369,7 @@ void calculate()
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
 		ts.unget(t);
+
 		cout << result << statement() << endl;
 		
 	}
