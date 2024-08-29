@@ -363,13 +363,14 @@ const string result = "= ";
 // main function, runs calculacion cycle
 void calculate()
 {
+	cout << prompt;
 	while (true) try {
-		cout << prompt;
+		if (cin.peek() == '\n') cout << prompt;
+		
 		Token t = ts.get();
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
 		ts.unget(t);
-
 		cout << result << statement() << endl;
 		
 	}
