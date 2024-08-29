@@ -365,18 +365,26 @@ void calculate()
 {
 	cout << prompt;
 	while (true) try {
-		if (cin.peek() == '\n') cout << prompt;
+		
+		if (cin.peek() == '\n') 
+		{ 
+			cin.ignore(); 
+			cout << prompt; 
+			continue;
+		}
 		
 		Token t = ts.get();
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
 		ts.unget(t);
-		cout << result << statement() << endl;
+		cout << result << statement() << '\n';
+		cout << prompt;
 		
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
 		clean_up_mess();
+		//cout << prompt;
 	}
 }
 
