@@ -353,6 +353,7 @@ double statement()
 // skips until "printres" sign
 void clean_up_mess()
 {
+	if (cin.peek() == '\n') return;
 	ts.ignore(printres);
 }
 
@@ -363,28 +364,19 @@ const string result = "= ";
 // main function, runs calculacion cycle
 void calculate()
 {
-	cout << prompt;
-	while (true) try {
-		
-		if (cin.peek() == '\n') 
-		{ 
-			cin.ignore(); 
-			cout << prompt; 
-			continue;
-		}
-		
+	
+	while (true) try {		
 		Token t = ts.get();
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
 		ts.unget(t);
 		cout << result << statement() << '\n';
-		cout << prompt;
+		
 		
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
 		clean_up_mess();
-		//cout << prompt;
 	}
 }
 
