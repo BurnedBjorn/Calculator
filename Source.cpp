@@ -42,6 +42,8 @@ const char number = '8';
 const char name = 'a';
 const char root = 'r';
 const char power = 'p';
+const char cst = '$';
+
 
 
 //function that gets the user input
@@ -92,6 +94,7 @@ Token Token_stream::get()
 			if (s == "quit") return Token(quit);
 			if (s == "sqrt") return Token(root);
 			if (s == "pow") return Token(power);
+			if (s == "const") return Token(cst);
 			return Token(name, s);
 		}
 		error("Bad token");
@@ -321,13 +324,22 @@ double expression()
 //handles variable declaration
 double declaration()
 {
+	bool iscst = false;
 	Token t = ts.get();
+	if (t.kind == cst) {
+		iscst = true;
+		t = ts.get();
+	}
 	if (t.kind != 'a') error("name expected in declaration");
 	string name = t.name;
 	if (st.is_declared(name)) error(name, " declared twice");
 	Token t2 = ts.get();
 	if (t2.kind != '=') error("= missing in declaration of ", name);
 	double d = expression();
+	if (iscst) {
+		st.define_constant(name, d);
+		return d;
+	}
 	st.add_variable(name, d);
 	return d;
 }
