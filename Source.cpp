@@ -49,7 +49,8 @@ Token Token_stream::get()
 {
 	if (full) { full = false; return buffer; }
 	char ch;
-	cin >> ch;
+	cin.get(ch);
+	while (ch == ' ') cin.get(ch);
 	switch (ch) {
 	case '(':
 	case ')':
@@ -62,6 +63,8 @@ Token Token_stream::get()
 	case '=':
 	case ',':
 		return Token(ch);
+	case '\n':
+		return Token(printres);
 	case '.':
 	case '0':
 	case '1':
@@ -363,6 +366,7 @@ void calculate()
 {
 	
 	while (true) try {		
+		cout << prompt;
 		Token t = ts.get();
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
