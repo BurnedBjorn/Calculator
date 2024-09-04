@@ -111,8 +111,14 @@ void Token_stream::ignore(char c)
 	full = false;
 
 	char ch;
-	while (cin >> ch)
-		if (ch == c) return;
+	cin.unget();
+	while (true){
+		cin.get(ch);
+		if (ch == c) return; 
+		if (ch == '\n') return;
+		continue;
+	}	
+	
 }
 
 // Data type for variables
@@ -166,14 +172,18 @@ double Symbol_table::get_value(string s)
 	error("get: undefined name ", s);
 }
 
-// make a predefined variable
+
+// basically the same function, it's possible to merge them
+	// make a predefined variable
 void Symbol_table::define_constant(string s, double d) {
-	var_table.push_back(Variable(s, d, true));
+var_table.push_back(Variable(s, d, true));
 }
 
-// add variable to the table
+	// add variable to the table
 void Symbol_table::add_variable(string name, double d) {
+
 	var_table.push_back(Variable(name, d));
+		
 }
 
 
@@ -365,8 +375,9 @@ double statement()
 // skips until "printres" sign
 void clean_up_mess()
 {
-	if (cin.peek() == '\n') return;
+	
 	ts.ignore(printres);
+	//ts.ignore('\n');
 }
 
 // symbols
