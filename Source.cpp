@@ -387,18 +387,28 @@ const string result = "= ";
 // main function, runs calculacion cycle
 void calculate()
 {
-	
-	while (true) try {		
-		cout << prompt;
+	cout << prompt;
+	while (true) try {	
+		
 		Token t = ts.get();
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == quit) return;
 		ts.unget(t);
 		cout << result << statement() << endl;
+		char ch;
+		cin.get(ch);
+		if (ch == '\n') cout << prompt;
+		cin.unget();
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
 		clean_up_mess();
+		cin.unget();
+		char ch;
+		cin.get(ch);
+		//cout << ch;
+		if (ch == '\n') cout << prompt;
+		
 	}
 }
 
