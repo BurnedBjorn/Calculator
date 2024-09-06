@@ -1,13 +1,5 @@
-
-/*
-	calculator08buggy.cpp
-
-	Helpful comments removed.
-
-	We have inserted 3 bugs that the compiler will catch and 3 that it won't.
-*/
-
 #include "std_lib_facilities.h"
+
 // struct that holds the user input. 
 struct Token {
 	char kind;
@@ -18,7 +10,6 @@ struct Token {
 	Token(char ch, string nm) :kind(ch), name(nm), value(0) { }
 
 };
-
 
 //User input management
 class Token_stream {
@@ -33,7 +24,6 @@ public:
 	void ignore(char);
 };
 
-
 //constants
 const char let = 'L';
 const char quit = 'Q';
@@ -47,8 +37,6 @@ const char help = 'h';
 const string manual = "manual placeholder";
 const string prompt = "> ";
 const string result = "= ";
-
-
 
 //function that gets the user input
 Token Token_stream::get()
@@ -128,6 +116,7 @@ void Token_stream::ignore(char c)
 	
 }
 
+
 // Data type for variables
 struct Variable {
 	string name;
@@ -137,6 +126,7 @@ struct Variable {
 	Variable(string n, double v, bool c) :name(n), value(v), isconst(c) { }
 };
 
+// class that handles variables
 class Symbol_table {
 	vector<Variable> var_table;
 public:
@@ -149,7 +139,7 @@ public:
 
 };
 
-
+//set a value to an existing variable
 void Symbol_table::set_value(string s, double d)
 {
 
@@ -179,14 +169,12 @@ double Symbol_table::get_value(string s)
 	error("get: undefined name ", s);
 }
 
-
-// basically the same function, it's possible to merge them
-	// make a predefined variable
+//add constant to the table
 void Symbol_table::define_constant(string s, double d) {
 var_table.push_back(Variable(s, d, true));
 }
 
-	// add variable to the table
+// add variable to the table
 void Symbol_table::add_variable(string name, double d) {
 
 	var_table.push_back(Variable(name, d));
@@ -194,10 +182,12 @@ void Symbol_table::add_variable(string name, double d) {
 }
 
 
-
+//symbol table instance
 Symbol_table st;
-//Token stream instance i guess
+
+//Token stream instance
 Token_stream ts;
+
 
 // expression function declaration
 double expression();
@@ -374,8 +364,6 @@ double declaration()
 	return d;
 }
 
-
-
 //checks if the line was declaration or expression, proceeds accordingly
 double statement()
 {
@@ -392,6 +380,7 @@ double statement()
 	}
 }
 
+
 // skips until "printres" sign
 void clean_up_mess()
 {
@@ -400,6 +389,7 @@ void clean_up_mess()
 	//ts.ignore('\n');
 }
 
+//outputs prompt symbol when needed
 void fprompt() {
 	cin.unget();
 	char ch;
@@ -408,7 +398,9 @@ void fprompt() {
 	if (ch == '\n') cout << prompt;
 	cin.unget();
 }
-// main function, runs calculacion cycle
+
+
+// calculation cycle
 void calculate()
 {
 	cout << prompt;
@@ -438,6 +430,7 @@ void calculate()
 	}
 }
 
+// main function, runs calculacion cycle
 int main()
 {
 	try {
