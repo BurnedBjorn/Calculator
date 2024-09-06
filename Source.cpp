@@ -292,7 +292,7 @@ double primary()
 		return t.value;
 	case name:
 	{
-		fname(t);
+		return(fname(t));
 	}
 	case root:
 	{
