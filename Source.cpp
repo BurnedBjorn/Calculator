@@ -45,6 +45,9 @@ const char power = 'p';
 const char cst = '$';
 const char help = 'h';
 const string manual = "manual placeholder";
+const string prompt = "> ";
+const string result = "= ";
+
 
 
 //function that gets the user input
@@ -384,10 +387,13 @@ void clean_up_mess()
 	//ts.ignore('\n');
 }
 
-// symbols
-const string prompt = "> ";
-const string result = "= ";
-
+void fprompt() {
+	char ch;
+	cin.get(ch);
+	while (ch == printres) cin.get(ch);
+	if (ch == '\n') cout << prompt;
+	cin.unget();
+}
 // main function, runs calculacion cycle
 void calculate()
 {
@@ -399,30 +405,20 @@ void calculate()
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == help) {
 			cout << manual << '\n';
-			char ch;
-			cin.get(ch);
-			while (ch == printres) cin.get(ch);
-			if (ch == '\n') cout << prompt;
-			cin.unget();
+			fprompt();
 			continue;
 		}
 		if (t.kind == quit) return;
 		
 		ts.unget(t);
 		cout << result << statement() << endl;
-		char ch;
-		cin.get(ch);
-		if (ch == '\n') cout << prompt;
-		cin.unget();
+		fprompt();
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
 		clean_up_mess();
 		cin.unget();
-		char ch;
-		cin.get(ch);
-		//cout << ch;
-		if (ch == '\n') cout << prompt;
+		fprompt();
 		
 	}
 }
