@@ -202,7 +202,7 @@ Token_stream ts;
 // expression function declaration
 double expression();
 
-
+// power functionality
 double fpower(Token t) {
 	
 	t = ts.get();
@@ -226,6 +226,27 @@ double fpower(Token t) {
 	}
 	else error("pow: ( expected");
 }
+
+// root functionality
+double froot(Token t) {
+	t = ts.get();
+	if (t.kind == '(') {
+		double d = expression();
+		if (d < 0) error("can't sqrt negative number");
+		t = ts.get();
+		if (t.kind == ')') {
+			return sqrt(d);
+		}
+		else {
+			error("root: ) expected");
+		}
+	}
+	else {
+		error("root: ( expected");
+	}
+}
+
+
 //gets the primary value to work with
 double primary()
 {
@@ -272,21 +293,7 @@ double primary()
 	}
 	case root:
 	{
-		t = ts.get();
-		if (t.kind == '(') {
-			double d = expression();
-			if (d < 0) error("can't sqrt negative number");
-			t = ts.get();
-			if (t.kind == ')') {
-				return sqrt(d);
-			}
-			else {
-				error("root: ) expected");
-			}
-		}
-		else {
-			error("root: ( expected");
-		}
+		return froot(t);
 	}
 	case power:
 	{
