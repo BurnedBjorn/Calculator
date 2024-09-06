@@ -43,7 +43,8 @@ const char name = 'a';
 const char root = 'r';
 const char power = 'p';
 const char cst = '$';
-
+const char help = 'h';
+const string manual = "manual placeholder";
 
 
 //function that gets the user input
@@ -64,7 +65,10 @@ Token Token_stream::get()
 	case ';':
 	case '=':
 	case ',':
+	case 'h':
 		return Token(ch);
+	case 'H':
+		return Token(help);
 	case '\n':
 		return Token(printres);
 	case '.':
@@ -391,8 +395,19 @@ void calculate()
 	while (true) try {	
 		
 		Token t = ts.get();
+		
 		while (t.kind == printres) t = ts.get();
+		if (t.kind == help) {
+			cout << manual << '\n';
+			char ch;
+			cin.get(ch);
+			while (ch == printres) cin.get(ch);
+			if (ch == '\n') cout << prompt;
+			cin.unget();
+			continue;
+		}
 		if (t.kind == quit) return;
+		
 		ts.unget(t);
 		cout << result << statement() << endl;
 		char ch;
@@ -415,7 +430,7 @@ void calculate()
 int main()
 {
 	try {
-		//Symbol_table::define_constant("pi", 3.141592);
+		cout << manual<<'\n';
 		calculate();
 		return 0;
 	}
