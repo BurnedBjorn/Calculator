@@ -203,7 +203,29 @@ Token_stream ts;
 double expression();
 
 
-
+double fpower(Token t) {
+	
+	t = ts.get();
+	if (t.kind == '(')
+	{
+		double d = expression();
+		double b = d;
+		t = ts.get();
+		if (t.kind != ',') error(", expected");
+		double p = expression();
+		t = ts.get();
+		if (t.kind == ')')
+		{
+			for (int i = 1; i < p; i++)
+			{
+				d *= b;
+			}
+			return(d);
+		}
+		else error("pow: ) expected");
+	}
+	else error("pow: ( expected");
+}
 //gets the primary value to work with
 double primary()
 {
@@ -268,26 +290,7 @@ double primary()
 	}
 	case power:
 	{
-		t = ts.get();
-		if (t.kind == '(')
-		{
-			double d = expression();
-			double b = d;
-			t = ts.get();
-			if (t.kind != ',') error(", expected");
-			double p = expression();
-			t = ts.get();
-			if (t.kind == ')')
-			{
-				for (int i = 1; i < p; i++)
-				{
-					d *= b;
-				}
-				return(d);
-			}
-			else error("pow: ) expected");
-		}
-		else error("pow: ( expected");
+		return fpower(t);
 	}
 	default:
 		error("primary expected");
@@ -388,6 +391,7 @@ void clean_up_mess()
 }
 
 void fprompt() {
+	cin.unget();
 	char ch;
 	cin.get(ch);
 	while (ch == printres) cin.get(ch);
@@ -412,12 +416,13 @@ void calculate()
 		
 		ts.unget(t);
 		cout << result << statement() << endl;
+		
 		fprompt();
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
 		clean_up_mess();
-		cin.unget();
+		
 		fprompt();
 		
 	}
