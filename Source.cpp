@@ -246,6 +246,33 @@ double froot(Token t) {
 	}
 }
 
+// variable handling functionality
+double fname(Token t) {
+	if (st.is_declared(t.name)) {
+		string localname = t.name;
+		t = ts.get();
+		if (t.kind == '=') { // if next symbol is = then
+			t = ts.get();
+			if (t.kind == number) {
+				st.set_value(localname, t.value);
+				cout << "value set: ";
+				return t.value;
+			}
+			else {
+				error("can't set value");
+			}
+
+		}
+		else {
+			ts.unget(t);
+			return st.get_value(localname);
+		}
+	}
+	else
+	{
+		return st.get_value(t.name);
+	}
+}
 
 //gets the primary value to work with
 double primary()
@@ -265,31 +292,7 @@ double primary()
 		return t.value;
 	case name:
 	{
-		if (st.is_declared(t.name)) {
-			string localname = t.name;
-			t = ts.get();
-			if (t.kind == '=') { // if next symbol is = then
-				t = ts.get();
-				if (t.kind == number) {
-					st.set_value(localname, t.value);
-					cout << "value set: ";
-					return t.value;
-				}
-				else {
-					error("can't set value");
-				}
-
-			}
-			else {
-				ts.unget(t);
-				return st.get_value(localname);
-			}
-		}
-		else
-		{
-			return st.get_value(t.name);
-		}
-		
+		fname(t);
 	}
 	case root:
 	{
