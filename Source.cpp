@@ -34,7 +34,7 @@ const char root = 'r';
 const char power = 'p';
 const char cst = '$';
 const char help = 'h';
-const string manual = "manual placeholder";
+const string manual = "manual: \n- operations avaliable: addition(+), subtraction(-), multiplication(*),\n division(*), power(pow(n,i), square root(sqrt(n)). \n-power function: pow(n,i) n is the number or expression you want to put to a power, i is the number of power you put the number to (can be an expression), the brackets and comma are necessary\n- square root: sqrt(n) where n is any number or expression, will give you the square root of n \n-variables: to create a variable, write 'let <name of the variable> = <number or expression>'. to reassign the existing variable's value, write '<name> = <value>'.\n you can use variable like a number. \n- constants: you can add a constant. it is almost the same as the variable, but in declaration you write 'let const <name> = <value> and you can't change it. You cannot delete variables or constants, so be careful.\n-to exit the program, type 'quit' or 'exit', to print the manual again, type letter h\n\n\n";
 const string prompt = "> ";
 const string result = "= ";
 
@@ -86,7 +86,7 @@ Token Token_stream::get()
 			while (cin.get(ch) && ((isalpha(ch) || isdigit(ch) || (ch == '_')))) s += ch; // while ch is letter or digit, add to string 
 			cin.unget();
 			if (s == "let") return Token(let);
-			if (s == "quit") return Token(quit);
+			if ((s == "quit")or (s=="exit")) return Token(quit);
 			if (s == "sqrt") return Token(root);
 			if (s == "pow") return Token(power);
 			if (s == "const") return Token(cst);
@@ -190,19 +190,19 @@ Token_stream ts;
 
 
 // expression function declaration
-double expression();
+double expression(Token_stream& ts);
 
 // power functionality
-double fpower(Token t) {
+double fpower(Token_stream& ts) {
 	
-	t = ts.get();
+	Token t = ts.get();
 	if (t.kind == '(')
 	{
-		double d = expression();
+		double d = expression(ts);
 		double b = d;
 		t = ts.get();
 		if (t.kind != ',') error(", expected");
-		double p = expression();
+		double p = expression(ts);
 		t = ts.get();
 		if (t.kind == ')')
 		{
@@ -218,10 +218,10 @@ double fpower(Token t) {
 }
 
 // root functionality
-double froot(Token t) {
-	t = ts.get();
+double froot(Token_stream& ts) {
+	Token t = ts.get();
 	if (t.kind == '(') {
-		double d = expression();
+		double d = expression(ts);
 		if (d < 0) error("can't sqrt negative number");
 		t = ts.get();
 		if (t.kind == ')') {
@@ -237,7 +237,8 @@ double froot(Token t) {
 }
 
 // variable handling functionality
-double fname(Token t) {
+double fname(Token_stream& ts) {
+	Token t = ts.get();
 	if (st.is_declared(t.name)) {
 		string localname = t.name;
 		t = ts.get();
@@ -249,7 +250,7 @@ double fname(Token t) {
 				return t.value;
 			}
 			else {
-				error("can't set value");
+				error("name: can't set value");
 			}
 
 		}
@@ -265,32 +266,33 @@ double fname(Token t) {
 }
 
 //gets the primary value to work with
-double primary()
+double primary(Token_stream& ts)
 {
 	Token t = ts.get();
 	switch (t.kind) {
 	case '(':
 	{
-		double d = expression();
+		double d = expression(ts);
 		t = ts.get();
 		if (t.kind != ')') error("'(' expected");
 		return d;
 	}
 	case '-':
-		return -primary();
+		return -primary(ts);
 	case number:
 		return t.value;
 	case name:
 	{
-		return(fname(t));
+		ts.unget(t);
+		return(fname(ts));
 	}
 	case root:
 	{
-		return froot(t);
+		return froot(ts);
 	}
 	case power:
 	{
-		return fpower(t);
+		return fpower(ts);
 	}
 	default:
 		error("primary expected");
@@ -298,18 +300,18 @@ double primary()
 }
 
 // Does multiplication/division to the primary if needed
-double term()
+double term(Token_stream& ts)
 {
-	double left = primary();
+	double left = primary(ts);
 	while (true) {
 		Token t = ts.get();
 		switch (t.kind) {
 		case '*':
-			left *= primary();
+			left *= primary(ts);
 			break;
 		case '/':
 		{
-			double d = primary();
+			double d = primary(ts);
 			if (d == 0) error("divide by zero");
 			left /= d;
 			break;
@@ -322,17 +324,17 @@ double term()
 }
 
 // does addition and subtraction of the terms if needed
-double expression()
+double expression(Token_stream& ts)
 {
-	double left = term();
+	double left = term(ts);
 	while (true) {
 		Token t = ts.get();
 		switch (t.kind) {
 		case '+':
-			left += term();
+			left += term(ts);
 			break;
 		case '-':
-			left -= term();
+			left -= term(ts);
 			break;	
 		default:
 			ts.unget(t);
@@ -342,7 +344,7 @@ double expression()
 }
 
 //handles variable declaration
-double declaration()
+double declaration(Token_stream& ts)
 {
 	bool iscst = false;
 	Token t = ts.get();
@@ -355,7 +357,7 @@ double declaration()
 	if (st.is_declared(name)) error(name, " declared twice");
 	Token t2 = ts.get();
 	if (t2.kind != '=') error("= missing in declaration of ", name);
-	double d = expression();
+	double d = expression(ts);
 	if (iscst) {
 		st.define_constant(name, d);
 		return d;
@@ -365,24 +367,24 @@ double declaration()
 }
 
 //checks if the line was declaration or expression, proceeds accordingly
-double statement()
+double statement(Token_stream& ts)
 {
 	Token t = ts.get();
 	switch (t.kind) {
 	case let:
-		return declaration();
+		return declaration(ts);
 		break;
 	case quit:
 		exit(0);
 	default:
 		ts.unget(t);
-		return expression();
+		return expression(ts);
 	}
 }
 
 
 // skips until "printres" sign
-void clean_up_mess()
+void clean_up_mess(Token_stream& ts)
 {
 	
 	ts.ignore(printres);
@@ -390,7 +392,7 @@ void clean_up_mess()
 }
 
 //outputs prompt symbol when needed
-void fprompt() {
+static void fprompt() {
 	cin.unget();
 	char ch;
 	cin.get(ch);
@@ -401,7 +403,7 @@ void fprompt() {
 
 
 // calculation cycle
-void calculate()
+void calculate(Token_stream& ts)
 {
 	cout << prompt;
 	while (true) try {	
@@ -417,14 +419,14 @@ void calculate()
 		if (t.kind == quit) return;
 		
 		ts.unget(t);
-		cout << result << statement() << endl;
+		cout << result << statement(ts) << endl;
 		
 		fprompt();
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
-		clean_up_mess();
-		
+		clean_up_mess(ts);
+		cout << "type 'h' to print out the manual\n";
 		fprompt();
 		
 	}
@@ -435,7 +437,7 @@ int main()
 {
 	try {
 		cout << manual<<'\n';
-		calculate();
+		calculate(ts);
 		return 0;
 	}
 	catch (exception& e) {
