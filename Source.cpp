@@ -15,8 +15,9 @@ struct Token {
 class Token_stream {
 	bool full;
 	Token buffer;
+	istream& ISinput;
 public:
-	Token_stream() :full(0), buffer(0) { }
+	Token_stream() :full(0), buffer(0), ISinput(cin){ }
 
 	Token get();
 	void unget(Token t) { buffer = t; full = true; }
@@ -413,6 +414,7 @@ void calculate(Token_stream& ts)
 		while (t.kind == printres) t = ts.get();
 		if (t.kind == help) {
 			cout << manual << '\n';
+			clean_up_mess(ts);
 			fprompt();
 			continue;
 		}
